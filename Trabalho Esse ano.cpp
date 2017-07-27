@@ -34,7 +34,7 @@ void mostraLista(RAM ra){
     }
     printf("]<- Fim\n");
 }
-
+//inserir um valor na memoria ram
 void inserir(TIPOCHAVE dado, TIPOCHAVE posicao, RAM *ra){
     NO *novo;
 	novo = (NO*)malloc(sizeof(NO));
@@ -48,7 +48,7 @@ void inserir(TIPOCHAVE dado, TIPOCHAVE posicao, RAM *ra){
 	}
 	ra->fim = novo;
 }
-
+//remover uma posicao da memoria ram
 int remover(RAM *ra){
 	NO *alvo;
 	alvo = ra->inicio;
@@ -66,7 +66,7 @@ int remover(RAM *ra){
 	
     return 1;
 }
-
+//verifica se o existe o valor na memoria ram
 //NO* buscaSeq(TIPOCHAVE ch, RAM ra, NO* *ant){
 //    NO* p = ra.inicio;
 //    *ant = NULL;
@@ -112,19 +112,28 @@ int main(){
 		scanf("%s %s", &opcode, &registradores);
 		//identificacao da instrucao
 		if((strncmp(opcode, "MOV", 3)) == 0){
+			//Encontro o tamanho da instrucao(Após o opcode)
 			tamPalavra = strlen(registradores);
+			//faço a contagem até o final da palavra para verificar cada elemento se é ou não uma virgula	
 			while(cont < tamPalavra){
+				//quando eu encontro a virgula passo o valor identifiquei então a separação entre o primeiro e o segundo dado
 				if(registradores[cont] == virgula[0]){
 					dividInstr = cont;
+					//copio tudo antes da virgula para uma variavel
 					strncpy(reg1, registradores, dividInstr);
+					//repasso os valores após a virgula para o minha variavel o "+1" existe pois preciso tirar a virgula destes dados sendo assim preciso somar um a mais do que o
+					//meio da instrucao
 					while(cont2 < dividInstr){
 						reg2[cont2] = registradores[dividInstr+cont2+1];
 						cont2++;	
-					}					
+					}			
+					//como foi encntrado uma virgula eu não preciso dar continuidade com o while então eu interrompo a sequencia		
 					cont = tamPalavra;
 				}
 				cont++;
 			}
+			//verifico se o que foi passado no segundo dado é um registrador ou um dado da memoria
+			//sendo um registrador eu identifico eles com um indice pré definido no inicio do codigo
 			if(((strcmp(reg2, "AX")) == 0) || ((strcmp(reg2, "BX")) == 0) || ((strcmp(reg2, "CX")) == 0) || ((strcmp(reg2, "DX")) == 0)){
 				if((strcmp(reg2, "AX")) == 0){
 					instrucao2Registrador = 1;
@@ -136,10 +145,13 @@ int main(){
 					instrucao2Registrador = 4;
 				}
 			}else{
+				//sendo uma posicao da memoria eu busco para verificar se ela existe na RAM
 				posicao2Memoria = atoi(reg2);
 				printf("posicao1Memoria: %i", posicao1Memoria);
 				printf("REG1: %s", reg1);
 			}
+			//verifico se o que foi passado no segundo dado é um registrador ou um dado da memoria
+			//sendo um registrador eu identifico eles com um indice pré definido no inicio do codigo
 			if(((strcmp(reg1, "AX")) == 0) || ((strcmp(reg1, "BX")) == 0) || ((strcmp(reg1, "CX")) == 0) || ((strcmp(reg1, "DX")) == 0)){
 				if((strcmp(reg1, "AX")) == 0){
 					instrucao1Registrador = 1;
@@ -151,12 +163,13 @@ int main(){
 					instrucao1Registrador = 4;
 				}
 			}else{
+				//sendo uma posicao da memoria eu busco para verificar se ela existe na RAM
 				posicao1Memoria = atoi(reg1);
 				printf("posicao1Memoria: %i", posicao1Memoria);
 				printf("REG1: %s", reg1);
 				printf("Busca na lista!\n");
 			}
-			
+			//se a instrucao for 2 registradores será verificado então quais são os registradores envolvidos e passado os valores de um para o outro
 			if(instrucao1Registrador > 0 && instrucao2Registrador > 0){
 				if(instrucao1Registrador == 1 &&  instrucao2Registrador == 2){
 					AX = BX;
@@ -185,6 +198,7 @@ int main(){
 					DX = CX;
 				}
 			}
+			//mostrar o resultado após a troca
 			printf("Registradores: \n PC: %i -- IR = %i -- MAR = %i -- MBR = %i -- AX = %i -- BX = %i -- CX= %i, DX = %i -- SF = %i -- CF = %i -- ZF = %i\n",
 			PC,IR,MAR,MBR,AX,BX,CX,DX,SF,CF,ZF);
 //			printf("reg1: %i", reg1);
