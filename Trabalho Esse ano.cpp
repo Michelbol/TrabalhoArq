@@ -12,7 +12,6 @@ typedef struct estrutura{
     TIPOCHAVE palavra;
     struct estrutura *prox;
 } NO;
-
 typedef struct {
     NO *inicio, *fim;
 } RAM;
@@ -68,13 +67,30 @@ int remover(RAM *ra){
     return 1;
 }
 
+//NO* buscaSeq(TIPOCHAVE ch, RAM ra, NO* *ant){
+//    NO* p = ra.inicio;
+//    *ant = NULL;
+//    while(p->chave < ch){
+//		*ant = p;
+//        p = p->prox;
+//        if(p->prox == NULL){
+//        	break;
+//		}
+//    }
+//	if((p->prox == NULL) && (p->chave == ch)) {
+//		return p;
+//	}
+//	return NULL;
+//}
+
 
 int main(){
 	//definindo os registradores que serao usados
-	int PC=0,IR=0,MAR=0,MBR=0,AX=0,BX=0,CX=0,DX=0,SF=0,CF=0;
+	//atencao AX = 1, BX = 2, CX = 3, DX = 4
+	int PC=0,IR=0,MAR=0,MBR=0,AX=5,BX=0,CX=0,DX=0,SF=0,CF=0, ZF = 0;
 	//variaveis auxiliares para serem utilizadas para obter informacoes
-	int tamPalavra = 0, cont =0, dividInstr = 0;
-	char sair[1], opcode[3], reg1[2], reg2[2], virgula[1], registradores[5];
+	int tamPalavra = 0, cont =0, cont2 = 0, dividInstr = 0, instrucao1Registrador = FALSE, instrucao2Registrador = FALSE, posicao1Memoria, posicao2Memoria;
+	char registradores[5], sair[1], opcode[3], virgula[2], reg1[2], reg2[2];
 	TIPOINFO palavra;
 	strcpy(virgula, ",");
 	//=========================Memoria Ram==============================================================================================================
@@ -86,7 +102,8 @@ int main(){
 	mostraLista(ram);
 	//==================================================================================================================================================
 	//printando os registradores
-	printf("Registradores: \n PC: %i -- IR = %i -- MAR = %i -- MBR = %i -- AX = %i -- BX = %i -- CX= %i, DX = %i -- SF = %i -- CF = %i\n", PC,IR,MAR,MBR,AX,BX,CX,DX,SF,CF);
+	printf("Registradores: \n PC: %i -- IR = %i -- MAR = %i -- MBR = %i -- AX = %i -- BX = %i -- CX= %i, DX = %i -- SF = %i -- CF = %i -- ZF = %i\n",
+	PC,IR,MAR,MBR,AX,BX,CX,DX,SF,CF,ZF);
 	system("pause");
 	//inicio da contagem dos 30 comandos que podem ser escritos
 	for(int i=0; i<30; i++){
@@ -94,32 +111,99 @@ int main(){
 		printf("Digite a instrucao: ");
 		scanf("%s %s", &opcode, &registradores);
 		//identificacao da instrucao
-		if((strncmp(palavra, "MOV", 3)) == 0){
+		if((strncmp(opcode, "MOV", 3)) == 0){
 			tamPalavra = strlen(registradores);
 			while(cont < tamPalavra){
 				if(registradores[cont] == virgula[0]){
-					strncpy(reg1,registradores, dividInstr);
 					dividInstr = cont;
+					strncpy(reg1, registradores, dividInstr);
+					while(cont2 < dividInstr){
+						reg2[cont2] = registradores[dividInstr+cont2+1];
+						cont2++;	
+					}					
 					cont = tamPalavra;
 				}
 				cont++;
-					printf("Reg1: %s\n", reg1);
-			printf("DividInstr: %i\n", dividInstr);
-			printf("TamPalavra: %i\n", tamPalavra);
-		}
+			}
+			if(((strcmp(reg2, "AX")) == 0) || ((strcmp(reg2, "BX")) == 0) || ((strcmp(reg2, "CX")) == 0) || ((strcmp(reg2, "DX")) == 0)){
+				if((strcmp(reg2, "AX")) == 0){
+					instrucao2Registrador = 1;
+				}else if((strcmp(reg2, "BX")) == 0){
+					instrucao2Registrador = 2;
+				}else if((strcmp(reg2, "CX")) == 0){
+					instrucao2Registrador = 3;
+				}else if((strcmp(reg2, "DX")) == 0){
+					instrucao2Registrador = 4;
+				}
+			}else{
+				posicao2Memoria = atoi(reg2);
+				printf("posicao1Memoria: %i", posicao1Memoria);
+				printf("REG1: %s", reg1);
+			}
+			if(((strcmp(reg1, "AX")) == 0) || ((strcmp(reg1, "BX")) == 0) || ((strcmp(reg1, "CX")) == 0) || ((strcmp(reg1, "DX")) == 0)){
+				if((strcmp(reg1, "AX")) == 0){
+					instrucao1Registrador = 1;
+				}else if((strcmp(reg1, "BX")) == 0){
+					instrucao1Registrador = 2;
+				}else if((strcmp(reg1, "CX")) == 0){
+					instrucao1Registrador = 3;
+				}else if((strcmp(reg1, "DX")) == 0){
+					instrucao1Registrador = 4;
+				}
+			}else{
+				posicao1Memoria = atoi(reg1);
+				printf("posicao1Memoria: %i", posicao1Memoria);
+				printf("REG1: %s", reg1);
+				printf("Busca na lista!\n");
+			}
 			
-		}else if((strncmp(palavra, "SUB", 3)) == 0){
+			if(instrucao1Registrador > 0 && instrucao2Registrador > 0){
+				if(instrucao1Registrador == 1 &&  instrucao2Registrador == 2){
+					AX = BX;
+				}else if(instrucao1Registrador == 1 &&  instrucao2Registrador == 3){
+					AX = CX;
+				}else if(instrucao1Registrador == 1 &&  instrucao2Registrador == 4){
+					AX = DX;
+				}else if(instrucao1Registrador == 2 &&  instrucao2Registrador == 1){
+					BX = AX;
+					printf("ola\n");
+				}else if(instrucao1Registrador == 2 &&  instrucao2Registrador == 3){
+					BX = CX;
+				}else if(instrucao1Registrador == 2 &&  instrucao2Registrador == 4){
+					BX = DX;
+				}else if(instrucao1Registrador == 3 &&  instrucao2Registrador == 1){
+					CX = AX;
+				}else if(instrucao1Registrador == 3 &&  instrucao2Registrador == 2){
+					CX = BX;
+				}else if(instrucao1Registrador == 3 &&  instrucao2Registrador == 4){
+					CX = DX;
+				}else if(instrucao1Registrador == 4 &&  instrucao2Registrador == 1){
+					DX = AX;
+				}else if(instrucao1Registrador == 4 &&  instrucao2Registrador == 2){
+					DX = BX;
+				}else if(instrucao1Registrador == 4 &&  instrucao2Registrador == 3){
+					DX = CX;
+				}
+			}
+			printf("Registradores: \n PC: %i -- IR = %i -- MAR = %i -- MBR = %i -- AX = %i -- BX = %i -- CX= %i, DX = %i -- SF = %i -- CF = %i -- ZF = %i\n",
+			PC,IR,MAR,MBR,AX,BX,CX,DX,SF,CF,ZF);
+//			printf("reg1: %i", reg1);
+//			printf("reg2: %i", reg2);
 			
-		}else if((strncmp(palavra, "ADD", 3)) == 0){
+		}else if((strncmp(opcode, "SUB", 3)) == 0){
 			
-		}else if((strncmp(palavra, "MUL", 3)) == 0){
+		}else if((strncmp(opcode, "ADD", 3)) == 0){
 			
-		}else if((strncmp(palavra, "DIV", 3)) == 0){
+		}else if((strncmp(opcode, "MUL", 3)) == 0){
 			
-		}else if((strncmp(palavra, "CMP", 3)) == 0){
+		}else if((strncmp(opcode, "DIV", 3)) == 0){
 			
-		}else if((strncmp(palavra, "J", 1)) == 0){
+		}else if((strncmp(opcode, "CMP", 3)) == 0){
 			
+		}else if((strncmp(opcode, "J", 1)) == 0){
+			
+		}else{
+			printf("eh um dado!");
 		}
 		printf("Deseja sair s/n?");
 		scanf("%s", sair);
